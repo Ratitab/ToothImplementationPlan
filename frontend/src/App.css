@@ -1,0 +1,151 @@
+#App {
+    height: 100vh;
+    text-align: center;
+}
+
+#logo {
+    display: block;
+    width: 50%;
+    height: 50%;
+    margin: auto;
+    padding: 0 0 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-origin: content-box;
+}
+
+.result {
+    height: 20px;
+    line-height: 20px;
+    margin: 1.5rem auto;
+    color: black;
+}
+
+.teeth {
+    align-items: center;
+    display: flex;
+}
+
+.pacientsName {
+    color: black;
+}
+
+
+
+.input-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+
+
+
+
+.upper-teeth {
+    display: flex;
+    justify-content: center; /* Center items horizontally within the flex container */
+    flex-wrap: wrap;         /* Wrap items to the next line if necessary */
+    gap: 5px;               /* Add space between the items */
+}
+
+.upper-teeth div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.teethContainer img {
+    margin-bottom: 3px;
+    cursor: pointer;      /* Add some space between the image and the paragraph */
+}
+
+.input-box .input {
+    border: none;
+    margin-top: 10px;
+    border-radius: 3px;
+    outline: none;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    background-color: rgba(240, 240, 240, 1);
+    -webkit-font-smoothing: antialiased;
+}
+
+.input-box .input:hover {
+    border: none;
+    background-color: rgb(174, 228, 163);
+}
+
+.input-box .input:focus {
+    border: none;
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.teethContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    flex-direction: column;  
+    margin-top: 30px;        
+}
+
+.TreatmentContainer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.FirstTreatment {
+    background-color: darkgray;
+    padding: 20px;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+    width: 80%;
+}
+
+.btnCollection {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.btn {
+    margin-top: 10px;
+    padding: 12px 24px;
+    font-size: 16px;
+    color: white;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn:hover {
+    background-color: #45a049;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.4);
+  }
+  
+  .btn:active {
+    background-color: #388e3c;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }

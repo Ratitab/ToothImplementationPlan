@@ -1,0 +1,61 @@
+.TreatmentsList {
+    display: flex;
+    justify-content: center;
+    color: gray;
+    width: 100%;
+    padding: 10px;
+}
+
+.TreatmentsInner {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1500px;
+    position: relative;
+    align-items: center; /* Center the items vertically */
+}
+
+.TreatmentsInner div {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+}
+
+.TreatmentsInner:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: lightgray;
+}
+
+.TreatmentsInner p {
+    margin: 0;
+}
+
+.delete-button {
+    padding: 9px 15px;
+    font-size: 16px;
+    color: white;
+    background-color: #f44336; /* Red color for delete button */
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+ .delete-button:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+ .delete-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(244, 67, 54, 0.4); /* Focus outline with red shadow */
+}
+
+ .delete-button:active {
+    background-color: #b71c1c; /* Darkest red on active */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,50 @@
+.teethContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 0;
+    gap: 50px
+}
+
+.tooth {
+    cursor: pointer;
+}
+
+.upper-teeth, .bottom-teeth {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+
+.upper-teeth div, .bottom-teeth div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.teethConatiner img {
+    margin-bottom: 5px;
+}
+
+.upper-teeth p, .bottom-teeth p {
+    background-color: #fff;
+    border-radius: 50%;
+    width: 30px;
+    height: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: green;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+/* .bottom-teeth{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+} */

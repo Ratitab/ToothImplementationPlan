@@ -1,0 +1,19 @@
+.FirstTreatment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: darkgray;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+  
+  .FirstTreatment p {
+    margin: 0; /* Remove default margin of paragraphs */
+  }
+
+  .price{
+    margin-left: auto;
+    font-weight: bold;
+    color: black;
+    font-size:larger;
+  }
