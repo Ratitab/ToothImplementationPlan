@@ -6,10 +6,18 @@ export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
+export function Login(arg1) {
+  return window['go']['main']['App']['Login'](arg1);
+}
+
 export function SaveScreenshot(arg1, arg2) {
   return window['go']['main']['App']['SaveScreenshot'](arg1, arg2);
 }
 
 export function SendMail(arg1) {
   return window['go']['main']['App']['SendMail'](arg1);
+}
+
+export function StorePacientsData(arg1) {
+  return window['go']['main']['App']['StorePacientsData'](arg1);
 }

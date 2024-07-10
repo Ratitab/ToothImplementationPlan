@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import "./App.css";
-import { Greet, SaveScreenshot, SendMail } from "../wailsjs/go/main/App";
+import { Greet, SaveScreenshot, SendMail, StorePacientsData } from "../wailsjs/go/main/App";
 import Teeth from "./teeth";
 import FirstTreatment from "./TreatmentText";
 import TreatmentInput from "./TreatmentsInput";
 import Treatments from "./treatments";
 import html2canvas from "html2canvas";
+import LoginComponent from "./login";
+import ButtonCollection from "./buttonCollection";
 
 function App() {
   const [resultText, setResultText] = useState("");
@@ -16,13 +18,16 @@ function App() {
   const [treatments, setTreatments] = useState([]);
   const [secondTreatments, setSecondTreatments] = useState([]);
   const [filename, setFilename] = useState("screenshot");
-  const [clickedTeeth, setClickedTeeth] = useState([]);
-  const [firstVisitTotalPriceDefault, setfirstVisitTotalPriceDefault] = useState(0)
-  const [secondVisitTotalPriceDefault, setsecondVisitTotalPriceDefault] = useState(0)
-  const [screws, setScrews] = useState({})
+  const [clickedTeeth, setClickedTeeth] = useState({});
+  const [firstVisitTotalPriceDefault, setfirstVisitTotalPriceDefault] =
+    useState(0);
+  const [secondVisitTotalPriceDefault, setsecondVisitTotalPriceDefault] =
+    useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  
-  const hadnleClear = () => {
+  const teethRef = useRef()
+
+  const handleClear = () => {
     setName("");
     setResultText("");
     setFirstVisitTotal(0);
@@ -32,39 +37,32 @@ function App() {
     setSecondTreatments([]);
     setClickedTeeth([]);
     setFilename("screenshot");
-    setfirstVisitTotalPriceDefault(0)
-    setsecondVisitTotalPriceDefault(0)
-  }
+    setfirstVisitTotalPriceDefault(0);
+    setsecondVisitTotalPriceDefault(0);
 
+    const inputElement = document.getElementById("name")
+    if (inputElement) {
+      inputElement.value = "";
+    }
+
+    if (teethRef.current) {
+      teethRef.current.clearTeeth();
+    }
+  };
 
   const updateName = (e) => {
-    const enteredName = e.target.value
-    setName(enteredName)
-    setFilename(`screenshot_${enteredName.replace(/\s+/g, '_')}`);
+    const enteredName = e.target.value;
+    setName(enteredName);
+    setFilename(`screenshot_${enteredName.replace(/\s+/g, "_")}`);
   };
   const updateResultText = (result) => setResultText(result);
-  
-  const handleToothClick = (toothNumber, event) => {
-    event.stopPropagation()
-    setScrews((prevScrews) => {
-      const currentState = prevScrews[toothNumber]
-      let nextState;
-      if (currentState === "screw") {
-        nextState = "-"
-      } else if (currentState === '-') {
-        nextState = undefined
-      } else {
-        nextState = "screw"
-      }
-    })
-    setClickedTeeth((prevTeeth) => {
-      if (prevTeeth.includes(toothNumber)) {
-        return prevTeeth.filter((tooth) => tooth !== toothNumber)
-      } else {
-        return [...prevTeeth, toothNumber]
-      }
-    })
-  } 
+
+  const handleToothClick = (toothNumber, status) => {
+    setClickedTeeth((prevTeeth) => ({
+      ...prevTeeth,
+      [toothNumber]: status,
+    }));
+  };
 
   function greet() {
     Greet(name).then(updateResultText);
@@ -114,7 +112,7 @@ function App() {
         windowWidth: document.documentElement.scrollWidth,
         windowHeight: document.documentElement.scrollHeight,
         scrollX: 0,
-        scrollY: -window.screenY 
+        scrollY: -window.screenY,
       });
       const dataUrl = canvas.toDataURL();
       const result = await SaveScreenshot(dataUrl, filename);
@@ -125,46 +123,99 @@ function App() {
   };
 
   const handleSendMail = async () => {
+    const formattedTreatments = treatments.map(t => ({
+      ...t,
+      quantity: parseInt(t.quantity),
+      onePrice: parseFloat(t.onePrice),
+      total: parseFloat(t.total)
+    }))
+    const formattedSecondTreatments = secondTreatments.map(t => ({
+      ...t,
+      quantity: parseInt(t.quantity),
+      onePrice: parseFloat(t.onePrice),
+      total: parseFloat(t.total)
+    }))
     const data = {
       name,
       clickedTeeth,
-      treatments,
-      secondTreatments
-    }
+      firsttreatments: formattedTreatments,
+      secondTreatments : formattedSecondTreatments,
+    };
     console.log("[DATA]", data);
     try {
       const result = await SendMail(data);
-      console.log(result)
-    } catch(error) {
-      console.error("failed to send mail", error)
+      console.log(result);
+    } catch (error) {
+      console.error("failed to send mail", error);
     }
+  };
+
+  if (!isLoggedIn) {
+    return <LoginComponent onLogin={() => setIsLoggedIn(true)} />;
+  }
+
+  const handleStoreData = async () => {
+    const formattedTreatments = treatments.map(t => ({
+      ...t,
+      quantity: parseInt(t.quantity),
+      onePrice: parseFloat(t.onePrice),
+      total: parseFloat(t.total)
+    }))
+    const formattedSecondTreatments = secondTreatments.map(t => ({
+      ...t,
+      quantity: parseInt(t.quantity),
+      onePrice: parseFloat(t.onePrice),
+      total: parseFloat(t.total)
+    }))
+    const data = {
+      name,
+      clickedTeeth,
+      firsttreatments: formattedTreatments,
+      secondTreatments : formattedSecondTreatments,
+    };
+    console.log("[data for storeData]",data)
+    try {
+      const result = await StorePacientsData(data)
+      console.log(result)
+    } catch (error) {
+      console.error("error stroing pacients data: ", error)
+    }
+    console.log("data will be stored not right now")
   }
 
 
-
+  const buttons = [
+    { text: "Take Screenshot", onClick: handleScreenshot },
+    { text: "Send Mail", onClick: handleSendMail },
+    { text: "Store Data", onClick: handleStoreData },
+    { text: "Clear", onClick: handleClear },
+  ];
 
   return (
     <div id="App">
-      <div className="pacientsName">Enter Patient's Name and Surname</div>
-      <div id="input" className="input-box">
-        <input
-          id="name"
-          className="input"
-          onChange={updateName}
-          autoComplete="off"
-          name="input"
-          type="text"
-        />
-        <button className="btn" onClick={greet}>
-          Enter
-        </button>
+      <div>
+        <div className="pacientsName">Enter Patient's Name and Surname</div>
+        <div id="input" className="input-box">
+          <input
+            id="name"
+            className="input"
+            onChange={updateName}
+            autoComplete="off"
+            name="input"
+            type="text"
+          />
+          <button className="btn" onClick={greet}>
+            Enter
+          </button>
+        </div>
       </div>
+
       <div id="result" className="result">
         {resultText}
       </div>
       <div className="content">
         <div className="teethContainer">
-          <Teeth onToothClick={handleToothClick} />
+          <Teeth onToothClick={handleToothClick} ref={teethRef} />
         </div>
         <FirstTreatment
           text={"1. Phase: First Visit Treatment (6 days)"}
@@ -202,17 +253,7 @@ function App() {
         ))}
         <FirstTreatment text={"Total Price Result"} price={totalVisitPrice} />
       </div>
-      <div className="btnCollection">
-        <button onClick={handleScreenshot}>
-          Take Screenshot
-        </button>
-        <button onClick={handleSendMail} >
-          send mail
-        </button>
-        <button onClick={hadnleClear}>
-          clear
-        </button>
-      </div>
+      <ButtonCollection buttons={buttons} />
     </div>
   );
 }

@@ -4,6 +4,10 @@ import {main} from '../models';
 
 export function Greet(arg1:string):Promise<string>;
 
+export function Login(arg1:main.Credentials):Promise<boolean>;
+
 export function SaveScreenshot(arg1:string,arg2:string):Promise<string>;
 
 export function SendMail(arg1:main.EmailData):Promise<string>;
+
+export function StorePacientsData(arg1:main.PacientsData):Promise<string>;

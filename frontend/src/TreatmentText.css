@@ -2,13 +2,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: darkgray;
+    background-color: rgb(143, 143, 143);
     padding: 15px;
     box-sizing: border-box;
   }
   
   .FirstTreatment p {
-    margin: 0; /* Remove default margin of paragraphs */
+    margin: 0;
   }
 
   .price{

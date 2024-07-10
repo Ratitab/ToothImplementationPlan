@@ -1,4 +1,4 @@
-import "./Treatmenttext.css";
+import "./TreatmentText.css";
 
 const FirstTreatment = ({text, price}) => {
   return (

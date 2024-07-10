@@ -42,9 +42,18 @@
     font-weight: bold;
 }
 
-/* .bottom-teeth{
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-} */
+.hyphen {
+    font-size: 2rem;
+    line-height: 1;
+    display: inline-block;
+    width: 40px;
+    text-align: center;
+  }
+  
+  .star {
+    font-size: 2rem;
+    line-height: 1;
+    display: inline-block;
+    width: 40px;
+    text-align: center; 
+  }

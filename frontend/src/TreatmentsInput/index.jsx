@@ -3,20 +3,41 @@ import "./index.css";
 
 const TreatmentInput = ({ onAddTreatment, secondTreatment }) => {
   const [text, setText] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [onePrice, setOnePrice] = useState(0);
+  const [quantity, setQuantity] = useState("");
+  const [onePrice, setOnePrice] = useState("");
+  const [error, setError] = useState("")
 
-  const handleTextChange = (e) => setText(e.target.value);
-  const handleQuantityChange = (e) => setQuantity(Number(e.target.value));
-  const handlePriceChange = (e) => setOnePrice(Number(e.target.value));
+  const handleTextChange = (e) => {
+    setText(e.target.value);
+    if (e.target.value) {
+      setError("")
+    }
+  }
+  const handleQuantityChange = (e) => {
+    const value = e.target.value;
+    if (!isNaN(value) && Number(value) >= 0) {
+      setQuantity(value);
+    }
+
+  }
+  const handlePriceChange = (e) => {
+    const value = e.target.value
+    if (!isNaN(value) && Number(value) >= 0) {
+      setOnePrice(value)
+    }
+  }
 
   const handleAddTreatment = () => {
     const total = quantity * onePrice;
+    if (!text) {
+      setError("please provide treatment name")
+      return;
+    }
     onAddTreatment({ text, quantity, onePrice, total });
     // Clear the input fields after adding the treatment
     setText("");
-    setQuantity(1);
-    setOnePrice(0);
+    setQuantity("");
+    setOnePrice("");
   };
 
   return (
@@ -33,17 +54,16 @@ const TreatmentInput = ({ onAddTreatment, secondTreatment }) => {
         </div>
         <div>
           <input
-            type="number"
+            type="text"
             value={quantity}
             onChange={handleQuantityChange}
-            min="1"
             placeholder="Quantity"
             className="inputs"
           />
         </div>
         <div>
           <input
-            type="number"
+            type="text"
             value={onePrice}
             onChange={handlePriceChange}
             placeholder="Price"
@@ -53,6 +73,7 @@ const TreatmentInput = ({ onAddTreatment, secondTreatment }) => {
         <div>
           <p className="total">${quantity * onePrice}</p>
         </div>
+        {!text && error }
         <div>
           <button onClick={handleAddTreatment} className="add-button">
             Add Treatment
