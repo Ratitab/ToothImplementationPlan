@@ -3,13 +3,13 @@ package main
 import "fmt"
 
 type PacientsData struct {
-	Name            string         `json:"Name"`
-	ClickedTeeth    map[int]string `json:"ClickedTeeth"`
-	FirstTreatment  []Treatment    `json:"firstTreatments"`
-	SecondTreatment []Treatment    `json:"secondTreatments"`
+	Email  string  `json:"email"`
+	Name   string  `json:"name"`
+	Phases []Phase `json:"phases"`
 }
 
 func (a *App) StorePacientsData(data PacientsData) (string, error) {
+	fmt.Println("[DATA FROM STORE DATA]", data.Phases)
 	collection := a.client.Database("ratitabidze").Collection("pacients")
 	_, err := collection.InsertOne(a.ctx, data)
 	if err != nil {

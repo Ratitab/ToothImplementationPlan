@@ -1,6 +1,7 @@
 #App {
     height: 100vh;
     text-align: center;
+    width: 100%;
 }
 
 #logo {
@@ -31,25 +32,17 @@
     color: black;
 }
 
-
-
 .input-box {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-
-
-
-
-
-
 .upper-teeth {
     display: flex;
-    justify-content: center; /* Center items horizontally within the flex container */
-    flex-wrap: wrap;         /* Wrap items to the next line if necessary */
-    gap: 5px;               /* Add space between the items */
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 
 .upper-teeth div {
@@ -58,10 +51,9 @@
     align-items: center;
 }
 
-
 .teethContainer img {
     margin-bottom: 3px;
-    cursor: pointer;      /* Add some space between the image and the paragraph */
+    cursor: pointer;
 }
 
 .input-box .input {
@@ -81,37 +73,70 @@
     background-color: rgb(174, 228, 163);
 }
 
+
+.enterDays input {
+    width: 20%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #919191;
+    border-radius: 4px;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+  }
+  
+  .enterDays button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px; /* Add margin to create space */
+  }
+  
+  .enterDays button:hover {
+    background-color: #0056b3;
+  }
+  
+  
 .input-box .input:focus {
     border: none;
     background-color: rgba(255, 255, 255, 1);
 }
 
+.treatments {
+    width: 100%;
+}
+
 .teethContainer {
     display: flex;
     justify-content: center;
-    align-items: center;    
-    flex-direction: column;  
-    margin-top: 30px;        
+    align-items: center;
+    flex-direction: column;
+    margin-top: 30px;
+}
+
+.content {
+    /* display: flex; */
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.FirstTreatment {
+    background-color: darkgray;
+    padding: 20px;
+    text-align: left;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .TreatmentContainer {
     display: flex;
     justify-content: center;
     width: 100%;
-}
-
-.content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.FirstTreatment {
-    background-color: darkgray;
-    padding: 20px;
-    text-align: left;
-    width: 100%;
-    box-sizing: border-box;
-    width: 80%;
 }
 
 .btnCollection {
@@ -132,12 +157,14 @@
     border-radius: 24px;
     cursor: pointer;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);    
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .btnFromCol:hover {
     background-color: #074402;
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
+
 .btn {
     margin-top: 10px;
     padding: 12px 24px;
@@ -149,19 +176,24 @@
     cursor: pointer;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .btn:hover {
+}
+
+.btn:hover {
     background-color: #45a049;
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  }
-  
-  .btn:focus {
+}
+
+.btn:focus {
     outline: none;
     box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.4);
-  }
-  
-  .btn:active {
+}
+
+.btn:active {
     background-color: #388e3c;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
+}
+
+.TreatmentInput, .Treatments {
+    width: 100%;
+    box-sizing: border-box;
+}

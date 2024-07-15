@@ -15,6 +15,7 @@ export namespace main {
 	    }
 	}
 	export class Treatment {
+	    disease: string;
 	    text: string;
 	    quantity: number;
 	    onePrice: number;
@@ -26,17 +27,54 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.disease = source["disease"];
 	        this.text = source["text"];
 	        this.quantity = source["quantity"];
 	        this.onePrice = source["onePrice"];
 	        this.total = source["total"];
 	    }
 	}
+	export class Phase {
+	    id: number;
+	    clickedTeeth: number[];
+	    days: string;
+	    treatments: Treatment[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Phase(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.clickedTeeth = source["clickedTeeth"];
+	        this.days = source["days"];
+	        this.treatments = this.convertValues(source["treatments"], Treatment);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class EmailData {
+	    dataUrl: string;
+	    email: string;
 	    name: string;
-	    clickedTeeth: {[key: number]: string};
-	    firsttreatments: Treatment[];
-	    secondTreatments: Treatment[];
+	    phases: Phase[];
 	
 	    static createFrom(source: any = {}) {
 	        return new EmailData(source);
@@ -44,10 +82,10 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.dataUrl = source["dataUrl"];
+	        this.email = source["email"];
 	        this.name = source["name"];
-	        this.clickedTeeth = source["clickedTeeth"];
-	        this.firsttreatments = this.convertValues(source["firsttreatments"], Treatment);
-	        this.secondTreatments = this.convertValues(source["secondTreatments"], Treatment);
+	        this.phases = this.convertValues(source["phases"], Phase);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -69,10 +107,9 @@ export namespace main {
 		}
 	}
 	export class PacientsData {
-	    Name: string;
-	    ClickedTeeth: {[key: number]: string};
-	    firstTreatments: Treatment[];
-	    secondTreatments: Treatment[];
+	    email: string;
+	    name: string;
+	    phases: Phase[];
 	
 	    static createFrom(source: any = {}) {
 	        return new PacientsData(source);
@@ -80,10 +117,9 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Name = source["Name"];
-	        this.ClickedTeeth = source["ClickedTeeth"];
-	        this.firstTreatments = this.convertValues(source["firstTreatments"], Treatment);
-	        this.secondTreatments = this.convertValues(source["secondTreatments"], Treatment);
+	        this.email = source["email"];
+	        this.name = source["name"];
+	        this.phases = this.convertValues(source["phases"], Phase);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -104,6 +140,7 @@ export namespace main {
 		    return a;
 		}
 	}
+	
 
 }
 

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "./index.css";
 
-const TreatmentInput = ({ onAddTreatment, secondTreatment }) => {
+const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
+  const [disease, setDisease] = useState("");
   const [text, setText] = useState("");
-  const [quantity, setQuantity] = useState("");
   const [onePrice, setOnePrice] = useState("");
   const [error, setError] = useState("")
+
+  // console.log(clickedTeeth)
 
   const handleTextChange = (e) => {
     setText(e.target.value);
@@ -13,13 +15,14 @@ const TreatmentInput = ({ onAddTreatment, secondTreatment }) => {
       setError("")
     }
   }
-  const handleQuantityChange = (e) => {
-    const value = e.target.value;
-    if (!isNaN(value) && Number(value) >= 0) {
-      setQuantity(value);
-    }
 
+  const handleDiseaseChange = (e) => {
+    setDisease(e.target.value)
+    if (e.target.value) {
+      setError("")
+    }
   }
+
   const handlePriceChange = (e) => {
     const value = e.target.value
     if (!isNaN(value) && Number(value) >= 0) {
@@ -28,21 +31,35 @@ const TreatmentInput = ({ onAddTreatment, secondTreatment }) => {
   }
 
   const handleAddTreatment = () => {
-    const total = quantity * onePrice;
+    const total = onePrice * quantity; 
     if (!text) {
       setError("please provide treatment name")
       return;
     }
-    onAddTreatment({ text, quantity, onePrice, total });
+    onAddTreatment({ disease,text, onePrice, total });
     // Clear the input fields after adding the treatment
     setText("");
-    setQuantity("");
+    setDisease("")
     setOnePrice("");
   };
+
+
 
   return (
     <div className="TreatmentsList">
       <div className="TreatmentsInner">
+        <div>
+        teeth: {clickedTeeth.join(", ")} <p>quantity: {quantity}x</p>
+        </div>
+        <div>
+        <input
+            type="text"
+            value={disease}
+            onChange={handleDiseaseChange}
+            placeholder="Disease"
+            className="inputs"
+          />
+        </div>
         <div>
           <input
             type="text"
@@ -55,23 +72,14 @@ const TreatmentInput = ({ onAddTreatment, secondTreatment }) => {
         <div>
           <input
             type="text"
-            value={quantity}
-            onChange={handleQuantityChange}
-            placeholder="Quantity"
-            className="inputs"
-          />
-        </div>
-        <div>
-          <input
-            type="text"
             value={onePrice}
             onChange={handlePriceChange}
-            placeholder="Price"
+            placeholder="One Item Price"
             className="inputs"
           />
         </div>
         <div>
-          <p className="total">${quantity * onePrice}</p>
+          <p className="total">${onePrice * quantity}</p>
         </div>
         {!text && error }
         <div>
