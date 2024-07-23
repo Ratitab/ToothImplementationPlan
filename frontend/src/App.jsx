@@ -6,6 +6,7 @@ import {
   SendMail,
   StorePacientsData,
   GetPacientsData,
+  CheckPaymentStatus
 } from "../wailsjs/go/main/App";
 import Teeth from "./teeth";
 import FirstTreatment from "./TreatmentText";
@@ -14,6 +15,8 @@ import Treatments from "./treatments";
 import html2canvas from "html2canvas";
 import LoginComponent from "./login";
 import ButtonCollection from "./buttonCollection";
+import IsNotPaid from "./isNotPaid";
+import CheckAppVersion from "./checkVersion";
 
 function App() {
   const [resultText, setResultText] = useState("");
@@ -26,8 +29,26 @@ function App() {
   const [newPhaseDays, setNewPhaseDays] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [phaseCounter, setPhaseCounter] = useState(1);
+  const [isPaid, setIsPaid] = useState(true)
 
   const teethRef = useRef();
+
+  useEffect(() => {
+    const checkPaymentStatus = async () => {
+      try {
+        const result = await CheckPaymentStatus()
+        console.log("egereve resulti",result)
+        if (!result) {
+          setIsPaid(false)
+        }
+      } catch(error) {
+        console.log("error checking payment status: ", error)
+        setIsPaid(false)
+      }
+    }
+
+    checkPaymentStatus()
+  }, [])
 
   const handleClear = () => {
     setName("");
@@ -246,8 +267,14 @@ function App() {
     setEmail(e.target.value);
   };
 
+  if (!isPaid) {
+    console.log("ARAAGADAXDILI")
+    return alert("ARAGADAXDILI")
+  }
+
   return (
     <div id="App">
+      <CheckAppVersion />
       <div>
         <div className="pacientsName">Enter Patient's Name and Surname</div>
         <div id="input" className="input-box">

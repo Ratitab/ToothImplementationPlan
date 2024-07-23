@@ -1,25 +1,53 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"log"
+	"net/http"
+	"net/url"
 )
 
 func (a *App) GetPacientsData(email string) (PacientsData, error) {
-	collection := a.client.Database("ratitabidze").Collection("pacients")
-	var data PacientsData
+	encodedEmail := url.QueryEscape(email)
+	url := fmt.Sprintf("http://localhost:8081/api/fetch-send-data/%s", encodedEmail)
 
-	filter := bson.M{"email": email}
-	err := collection.FindOne(a.ctx, filter).Decode(&data)
+	resp, err := http.Get(url)
+
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			// no email found
-			return PacientsData{}, fmt.Errorf("patient not found")
-		}
+		log.Println("error fetching data from gin backend", err)
 		return PacientsData{}, err
 	}
-	fmt.Println("thhee fetched data", data)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Println("recieved non-ok response from gin bakcend: ", resp.Status)
+		return PacientsData{}, fmt.Errorf("failed to fetch data: %v", resp.Status)
+	}
+
+	var data PacientsData
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		log.Println("error decoding response from gin backend:", err)
+		return PacientsData{}, err
+	}
+
+	log.Println("fetched data", data)
 	return data, nil
+
+	// collection := a.client.Database("ratitabidze").Collection("pacients")
+	// var data PacientsData
+
+	// filter := bson.M{"email": email}
+	// err := collection.FindOne(a.ctx, filter).Decode(&data)
+	// if err != nil {
+	// 	if err == mongo.ErrNoDocuments {
+	// 		// no email found
+	// 		return PacientsData{}, fmt.Errorf("patient not found")
+	// 	}
+	// 	return PacientsData{}, err
+	// }
+	// fmt.Println("thhee fetched data", data)
+	// return data, nil
 }
