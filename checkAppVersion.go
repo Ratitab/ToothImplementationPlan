@@ -13,7 +13,7 @@ type VersionResponse struct {
 }
 
 func (a *App) CheckAppVersion() (string, string, error) {
-	url := "http://localhost:8081/api/check-version"
+	url := os.Getenv("BASE_URL") + "/check-version"
 
 	resp, err := http.Get(url)
 

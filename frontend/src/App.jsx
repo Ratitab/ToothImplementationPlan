@@ -16,8 +16,9 @@ import html2canvas from "html2canvas";
 import LoginComponent from "./login";
 import ButtonCollection from "./buttonCollection";
 import IsNotPaid from "./isNotPaid";
+import DatePicker from "react-datepicker";
 import CheckAppVersion from "./checkVersion";
-
+import "react-datepicker/dist/react-datepicker.css";
 function App() {
   const [resultText, setResultText] = useState("");
   const [name, setName] = useState("");
@@ -30,7 +31,8 @@ function App() {
   const [quantity, setQuantity] = useState(0);
   const [phaseCounter, setPhaseCounter] = useState(1);
   const [isPaid, setIsPaid] = useState(true)
-
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const teethRef = useRef();
 
   useEffect(() => {
@@ -141,20 +143,29 @@ function App() {
     );
   };
 
+  const calculateDaysDifference = (start, end) => {
+    const diffTime = Math.abs(new Date(end).getTime() - new Date(start).getTime());
+    console.log("diff", diffTime)
+    console.log("AKAVAART", start, end,Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+
+    return (Math.ceil(diffTime / (1000 * 60 * 60 * 24))).toString();
+  };
+
   const handleAddPhase = () => {
     const clickedTeethArray = teethRef.current.getClickedTeeth();
     setQuantity(clickedTeethArray.length);
-    // console.log("[addphase]",clickedTeethArray);
+    console.log("[addphase]",clickedTeethArray);
 
 
 
-    if (!newPhaseDays) return;
+    // if (!newPhaseDays) return;
     const newPhase = {
       id: phaseCounter,
-      days: newPhaseDays,
+      days: calculateDaysDifference(startDate,endDate),
       treatments: [],
       clickedTeeth: clickedTeethArray
     };
+    console.log(newPhase)
     setPhases((prevPhases) => [...prevPhases, newPhase]);
     setNewPhaseDays("");
     setClickedTeeth({});
@@ -164,8 +175,11 @@ function App() {
     setPhaseCounter((prevCounter) => prevCounter + 1)
   };
 
-  const handleDaysChange = (e) => {
-    setNewPhaseDays(e.target.value);
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+  const handleEndDateChange = (e) => {
+    setEndDate(e.target.value);
   };
 
   const handleScreenshot = async () => {
@@ -310,12 +324,20 @@ function App() {
         </div>
 
         <div className="enterDays">
-          <input
-            type="number"
-            value={newPhaseDays}
-            onChange={handleDaysChange}
-            placeholder="Enter days for new phase"
-          />
+         
+      <DatePicker
+        selected={startDate}
+        onChange={(dates) => {
+          const [start, end] = dates;
+          setStartDate(start);
+          setEndDate(end);
+        }}
+        startDate={startDate}
+        endDate={endDate}
+        selectsRange
+      />
+     
+
           <button onClick={handleAddPhase} >Add Phase</button>
         </div>
         <div className="treatments">

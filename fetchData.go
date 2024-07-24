@@ -6,11 +6,12 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 func (a *App) GetPacientsData(email string) (PacientsData, error) {
 	encodedEmail := url.QueryEscape(email)
-	url := fmt.Sprintf("http://localhost:8081/api/fetch-send-data/%s", encodedEmail)
+	url := fmt.Sprintf(os.Getenv("BASE_URL")+"/fetch-send-data/%s", encodedEmail)
 
 	resp, err := http.Get(url)
 

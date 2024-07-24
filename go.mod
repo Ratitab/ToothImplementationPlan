@@ -5,6 +5,7 @@ go 1.21
 toolchain go1.22.2
 
 require (
+	github.com/joho/godotenv v1.5.1
 	github.com/wailsapp/wails/v2 v2.9.0
 	go.mongodb.org/mongo-driver v1.16.0
 )

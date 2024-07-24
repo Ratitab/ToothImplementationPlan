@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 type PacientsData struct {
@@ -16,7 +17,7 @@ type PacientsData struct {
 
 func (a *App) StorePacientsData(data PacientsData) (string, error) {
 	fmt.Println("[DATA FROM STORE DATA]", data.Phases)
-	url := "http://localhost:8081/api/store-data"
+	url := os.Getenv("BASE_URL") + "/store-data"
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {

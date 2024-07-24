@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -19,7 +20,7 @@ type LoginResponse struct {
 }
 
 func (a *App) Login(creds Credentials) bool {
-	loginURL := "http://localhost:8081/api/app-login"
+	loginURL := os.Getenv("BASE_URL") + "/app-login"
 	jsonData, err := json.Marshal(creds)
 
 	if err != nil {
