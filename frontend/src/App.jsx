@@ -6,7 +6,7 @@ import {
   SendMail,
   StorePacientsData,
   GetPacientsData,
-  CheckPaymentStatus
+  CheckPaymentStatus,
 } from "../wailsjs/go/main/App";
 import Teeth from "./teeth";
 import FirstTreatment from "./TreatmentText";
@@ -30,27 +30,27 @@ function App() {
   const [newPhaseDays, setNewPhaseDays] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [phaseCounter, setPhaseCounter] = useState(1);
-  const [isPaid, setIsPaid] = useState(true)
-  const [startDate, setStartDate] = useState("")
-  const [endDate, setEndDate] = useState("")
+  const [isPaid, setIsPaid] = useState(true);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const teethRef = useRef();
 
   useEffect(() => {
     const checkPaymentStatus = async () => {
       try {
-        const result = await CheckPaymentStatus()
-        console.log("egereve resulti",result)
+        const result = await CheckPaymentStatus();
+        console.log("egereve resulti", result);
         if (!result) {
-          setIsPaid(false)
+          setIsPaid(false);
         }
-      } catch(error) {
-        console.log("error checking payment status: ", error)
-        setIsPaid(false)
+      } catch (error) {
+        console.log("error checking payment status: ", error);
+        setIsPaid(false);
       }
-    }
+    };
 
-    checkPaymentStatus()
-  }, [])
+    checkPaymentStatus();
+  }, []);
 
   const handleClear = () => {
     setName("");
@@ -144,42 +144,46 @@ function App() {
   };
 
   const calculateDaysDifference = (start, end) => {
-    const diffTime = Math.abs(new Date(end).getTime() - new Date(start).getTime());
-    console.log("diff", diffTime)
-    console.log("AKAVAART", start, end,Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+    const diffTime = Math.abs(
+      new Date(end).getTime() - new Date(start).getTime()
+    );
+    console.log("diff", diffTime);
+    console.log(
+      "AKAVAART",
+      start,
+      end,
+      Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    );
 
-    return (Math.ceil(diffTime / (1000 * 60 * 60 * 24))).toString();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)).toString();
   };
 
   const handleAddPhase = () => {
     const clickedTeethArray = teethRef.current.getClickedTeeth();
     setQuantity(clickedTeethArray.length);
-    console.log("[addphase]",clickedTeethArray);
-
-
+    console.log("[addphase]", clickedTeethArray);
 
     // if (!newPhaseDays) return;
     const newPhase = {
       id: phaseCounter,
-      days: calculateDaysDifference(startDate,endDate),
+      days: calculateDaysDifference(startDate, endDate),
+      startDate: startDate,
+      endDate: endDate,
       treatments: [],
-      clickedTeeth: clickedTeethArray
+      clickedTeeth: clickedTeethArray,
     };
-    console.log(newPhase)
+    console.log("newPhase",newPhase);
     setPhases((prevPhases) => [...prevPhases, newPhase]);
     setNewPhaseDays("");
     setClickedTeeth({});
+    setStartDate(null); // Reset startDate
+    setEndDate(null); // Reset endDate
+
+    
     if (teethRef.current) {
       teethRef.current.clearTeeth();
     }
-    setPhaseCounter((prevCounter) => prevCounter + 1)
-  };
-
-  const handleStartDateChange = (e) => {
-    setStartDate(e.target.value);
-  };
-  const handleEndDateChange = (e) => {
-    setEndDate(e.target.value);
+    setPhaseCounter((prevCounter) => prevCounter + 1);
   };
 
   const handleScreenshot = async () => {
@@ -205,7 +209,7 @@ function App() {
 
   const handleSendMail = async () => {
     if (name === "" || email === "") {
-      alert("enter name and email to proceed")
+      alert("enter name and email to proceed");
       return;
     }
     const processedPhases = phases.map((phase) => ({
@@ -227,11 +231,11 @@ function App() {
       scrollY: -window.screenY,
     });
     const dataUrl = canvas.toDataURL();
-    console.log("[PROCCESEDPHASES]",processedPhases)
+    console.log("[PROCCESEDPHASES]", processedPhases);
     const data = {
       email,
       name,
-      phases : processedPhases,
+      phases: processedPhases,
       dataUrl,
     };
     // console.log("[DATA]", data);
@@ -270,6 +274,27 @@ function App() {
     console.log("Data will be stored not right now");
   };
 
+  const totalPrice = phases.reduce((total, phase) => {
+    return (
+      total +
+      phase.treatments.reduce(
+        (phaseTotal, treatment) => phaseTotal + treatment.total,
+        0
+      )
+    );
+  }, 0);
+
+  const formatDate = (date) => {
+    if (!date) return "";
+    const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
+    return new Date(date).toLocaleDateString('en-GB', options);
+  };
+
+  const hasTreatment = phases.some((phase) => phase.treatments.length > 0)
+  const firstPhaseStartDate = phases.length > 0 ? phases[0].startDate : "";
+  const lastPhaseEndDate = phases.length > 0 ? phases[phases.length - 1].endDate : "";
+
+
   const buttons = [
     { text: "Take Screenshot", onClick: handleScreenshot },
     { text: "Send Mail", onClick: handleSendMail },
@@ -282,8 +307,8 @@ function App() {
   };
 
   if (!isPaid) {
-    console.log("ARAAGADAXDILI")
-    return alert("ARAGADAXDILI")
+    console.log("ARAAGADAXDILI");
+    return alert("ARAGADAXDILI");
   }
 
   return (
@@ -324,27 +349,25 @@ function App() {
         </div>
 
         <div className="enterDays">
-         
-      <DatePicker
-        selected={startDate}
-        onChange={(dates) => {
-          const [start, end] = dates;
-          setStartDate(start);
-          setEndDate(end);
-        }}
-        startDate={startDate}
-        endDate={endDate}
-        selectsRange
-      />
-     
+          <DatePicker
+            selected={startDate}
+            onChange={(dates) => {
+              const [start, end] = dates;
+              setStartDate(start);
+              setEndDate(end);
+            }}
+            startDate={startDate}
+            endDate={endDate}
+            selectsRange
+          />
 
-          <button onClick={handleAddPhase} >Add Phase</button>
+          <button onClick={handleAddPhase}>Add Phase</button>
         </div>
         <div className="treatments">
           {phases.map((phase, index) => (
             <div key={phase.id}>
               <FirstTreatment
-                text={`Phase ${index + 1}: Treatment (${phase.days} days)`}
+                text={`Phase ${index + 1}: Treatment Days: (${phase.days} days) Dates: (${formatDate(phase.startDate)} - ${formatDate(phase.endDate)})`}
                 price={phase.treatments.reduce(
                   (total, treatment) => total + treatment.total,
                   0
@@ -371,8 +394,11 @@ function App() {
                   }
                 />
               ))}
+              
+
             </div>
           ))}
+          {hasTreatment && <FirstTreatment text={`Total Days: ${formatDate(firstPhaseStartDate)} - ${formatDate(lastPhaseEndDate)} `} price={totalPrice} />}
         </div>
       </div>
       <ButtonCollection buttons={buttons} />
