@@ -9,6 +9,7 @@ import (
 
 type Treatment struct {
 	Disease  string  `json:"disease"`
+	Comment  string  `json:"comment"`
 	Text     string  `json:"text"`
 	Quantity int     `json:"quantity"`
 	OnePrice float64 `json:"onePrice"`
@@ -42,7 +43,7 @@ func formatTreatments(treatments []Treatment) (string, float64) {
 	var totalPrice float64
 	var sb strings.Builder
 	for _, t := range treatments {
-		sb.WriteString(fmt.Sprintf("	disease:%s,\n	Treatment: %s,\n	Quantity: %d,\n	One Price: %.2f,\n	Total: %.2f\n ", t.Disease, t.Text, t.Quantity, t.OnePrice, t.Total))
+		sb.WriteString(fmt.Sprintf("	disease:%s,\n	Treatment: %s,\n	Quantity: %d,\n	One Price: %.2f,\n	Comment:%s \n	Total: %.2f\n ", t.Disease, t.Text, t.Quantity, t.OnePrice, t.Comment, t.Total))
 		totalPrice += t.Total
 	}
 	return sb.String(), totalPrice

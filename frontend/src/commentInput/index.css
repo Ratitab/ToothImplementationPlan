@@ -1,0 +1,28 @@
+.comment-input {
+    margin-top: 10px;
+  }
+  
+  .comment-input-field {
+    width: 80%;
+    padding: 5px;
+    margin-right: 10px;
+  }
+  
+  .comment-submit-button {
+    padding: 5px 10px;
+  }
+  
+  .treatment-input {
+    margin-bottom: 10px;
+  }
+  
+  .treatment-input-field {
+    width: 80%;
+    padding: 5px;
+    margin-right: 10px;
+  }
+  
+  .treatment-submit-button {
+    padding: 5px 10px;
+  }
+  

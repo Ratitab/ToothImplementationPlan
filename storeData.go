@@ -16,7 +16,7 @@ type PacientsData struct {
 }
 
 func (a *App) StorePacientsData(data PacientsData) (string, error) {
-	fmt.Println("[DATA FROM STORE DATA]", data.Phases)
+	fmt.Println("[DATA FROM STORE DATA]", data.Phases[0].Treatments[0].Comment)
 	url := os.Getenv("BASE_URL") + "/store-data"
 
 	jsonData, err := json.Marshal(data)
@@ -54,6 +54,7 @@ func (a *App) StorePacientsData(data PacientsData) (string, error) {
 	}
 
 	log.Println("Data stored successfully:", result.Message)
+	fmt.Println("PACIENTS DATA")
 	return result.Message, nil
 
 	// collection := a.client.Database("ratitabidze").Collection("pacients")

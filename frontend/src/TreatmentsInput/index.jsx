@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./index.css";
 import { SearchDiseases, SearchTreatments } from "../../wailsjs/go/main/App";
+import CommentInput from "../commentInput";
 
 const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
   const [disease, setDisease] = useState("");
@@ -8,22 +9,28 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
   const [onePrice, setOnePrice] = useState("");
   const [error, setError] = useState("");
   const [diseaseSuggestions, setdiseaseSuggestions] = useState([]);
-  const [treatmentSuggestions, setTreatmentSuggestions] = useState([])
+  const [treatmentSuggestions, setTreatmentSuggestions] = useState([]);
+  const [comment, setComment] = useState("")
+
+
+  const handleCommentChange = (a) => {
+      setComment(a.target.value)
+  }
 
   const fetchTreatmentSuggestions = async (query) => {
     if (query.length > 1) {
       try {
-        const response = await SearchTreatments(query)
+        const response = await SearchTreatments(query);
         if (response !== null) {
-          setTreatmentSuggestions(response)
-        } 
+          setTreatmentSuggestions(response);
+        }
       } catch {
-        console.error("cant fetch suggestions")
+        console.error("cant fetch suggestions");
       }
     } else {
-      setTreatmentSuggestions([])
+      setTreatmentSuggestions([]);
     }
-  }
+  };
 
   const fetchdiseaseSuggestions = async (query) => {
     if (query.length > 2) {
@@ -57,9 +64,9 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
   };
 
   const handleDiseaseSuggestionClick = (suggestion) => {
-    setDisease(suggestion.Name)
-    setdiseaseSuggestions([])
-  }
+    setDisease(suggestion.Name);
+    setdiseaseSuggestions([]);
+  };
 
   const handlePriceChange = (e) => {
     const value = e.target.value;
@@ -74,17 +81,18 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
       setError("Please provide treatment name");
       return;
     }
-    onAddTreatment({ disease, text, onePrice, total });
+    onAddTreatment({ disease, text, onePrice, total, comment });
     // Clear the input fields after adding the treatment
     setText("");
     setDisease("");
     setOnePrice("");
+    setComment("")
   };
 
   const handleTreatmentSuggestionList = (suggestion) => {
-    setText(suggestion.Name)
-    setTreatmentSuggestions([])
-  }
+    setText(suggestion.Name);
+    setTreatmentSuggestions([]);
+  };
 
   return (
     <div className="TreatmentsList">
@@ -92,7 +100,7 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
         <div>
           Teeth: {clickedTeeth.join(", ")} <p>Quantity: {quantity}x</p>
         </div>
-        <div style={{position: 'relative'}}>
+        <div style={{ position: "relative" }}>
           <input
             type="text"
             value={disease}
@@ -103,14 +111,17 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
           {diseaseSuggestions.length > 0 && (
             <ul className="suggestion-list">
               {diseaseSuggestions.map((suggestion, index) => (
-                <li key={index} onClick={() => handleDiseaseSuggestionClick(suggestion)}>
+                <li
+                  key={index}
+                  onClick={() => handleDiseaseSuggestionClick(suggestion)}
+                >
                   {suggestion.Name}
                 </li>
               ))}
             </ul>
           )}
         </div>
-        <div style={{position: 'relative'}}>
+        <div style={{ position: "relative" }}>
           <input
             type="text"
             value={text}
@@ -121,7 +132,10 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
           {treatmentSuggestions.length > 0 && (
             <ul className="suggestion-list">
               {treatmentSuggestions.map((suggestion, index) => (
-                <li key={index} onClick={() => handleTreatmentSuggestionList(suggestion)}>
+                <li
+                  key={index}
+                  onClick={() => handleTreatmentSuggestionList(suggestion)}
+                >
                   {suggestion.Name}
                 </li>
               ))}
@@ -136,6 +150,15 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
             placeholder="One Item Price"
             className="inputs"
           />
+        </div>
+        <div>
+        <input
+          type="text"
+          value={comment}
+          onChange={handleCommentChange}
+          placeholder="Add a comment..."
+          className="inputs"
+        />
         </div>
         <div>
           <p className="total">${onePrice * quantity}</p>

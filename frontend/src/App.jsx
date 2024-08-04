@@ -121,6 +121,7 @@ function App() {
       total,
     };
 
+    console.log(newTreatment)
     setPhases((prevPhases) =>
       prevPhases.map((phase) =>
         phase.id === phaseId

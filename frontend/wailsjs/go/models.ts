@@ -16,6 +16,7 @@ export namespace main {
 	}
 	export class Treatment {
 	    disease: string;
+	    comment: string;
 	    text: string;
 	    quantity: number;
 	    onePrice: number;
@@ -28,6 +29,7 @@ export namespace main {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.disease = source["disease"];
+	        this.comment = source["comment"];
 	        this.text = source["text"];
 	        this.quantity = source["quantity"];
 	        this.onePrice = source["onePrice"];
