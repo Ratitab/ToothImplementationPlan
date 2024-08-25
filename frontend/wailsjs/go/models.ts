@@ -14,6 +14,30 @@ export namespace main {
 	        this.password = source["password"];
 	    }
 	}
+	export class CurrencyResponse {
+	    code: string;
+	    quantity: number;
+	    rate: number;
+	    name: string;
+	    diff: number;
+	    date: string;
+	    validFromDate: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new CurrencyResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.quantity = source["quantity"];
+	        this.rate = source["rate"];
+	        this.name = source["name"];
+	        this.diff = source["diff"];
+	        this.date = source["date"];
+	        this.validFromDate = source["validFromDate"];
+	    }
+	}
 	export class Treatment {
 	    disease: string;
 	    comment: string;

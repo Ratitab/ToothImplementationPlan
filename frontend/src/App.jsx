@@ -7,6 +7,7 @@ import {
   StorePacientsData,
   GetPacientsData,
   CheckPaymentStatus,
+  GetCurrency,
 } from "../wailsjs/go/main/App";
 import Teeth from "./teeth";
 import FirstTreatment from "./TreatmentText";
@@ -19,12 +20,16 @@ import IsNotPaid from "./isNotPaid";
 import DatePicker from "react-datepicker";
 import CheckAppVersion from "./checkVersion";
 import "react-datepicker/dist/react-datepicker.css";
+import { da, tr } from "date-fns/locale";
 function App() {
   const [resultText, setResultText] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [filename, setFilename] = useState("screenshot");
   const [clickedTeeth, setClickedTeeth] = useState({});
+  const [exchangeRate, setExchangeRate] = useState(null)
+  const [amount, setAmount] = useState(0)
+  const [convertedAmount, setConvertedAmount] = useState(0)
   const [phases, setPhases] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [newPhaseDays, setNewPhaseDays] = useState("");
@@ -51,6 +56,36 @@ function App() {
 
     checkPaymentStatus();
   }, []);
+
+  const fetchExchangeRates = async() => {
+    try {
+      const response = await GetCurrency()
+      const data = await response.json()
+      console.log("[DATA]",data)
+      setExchangeRate(data.CurrencyResponse)
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
+  
+
+
+  const handleCurrencyChange = () => {
+    const data = fetchExchangeRates()
+    console.log(data)
+    if (exchangeRate) {
+      if (isGEL) {
+        setConvertedAmount(amount * exchangeRate); // Convert GEL to USD
+      } else {
+        setConvertedAmount(amount / exchangeRate); // Convert USD back to GEL
+      }
+      setIsGEL(!isGEL); // Toggle the currency state
+    } else {
+      console.error('Exchange rate not available');
+    }
+  }
 
   const handleClear = () => {
     setName("");
@@ -275,6 +310,19 @@ function App() {
     console.log("Data will be stored not right now");
   };
 
+  const handleOnPhaseDelete = (id) => {
+    setPhases((prevPhases) => {
+      const updatedPhases = prevPhases.filter(phase => phase.id !== id)
+
+      const reindexedPhases = updatedPhases.map((phase, index) => ({
+        ...phase,
+        id:index + 1
+      }))
+
+      return reindexedPhases
+    })
+  }
+
   const totalPrice = phases.reduce((total, phase) => {
     return (
       total +
@@ -300,6 +348,7 @@ function App() {
     { text: "Take Screenshot", onClick: handleScreenshot },
     { text: "Send Mail", onClick: handleSendMail },
     { text: "Store Data", onClick: handleStoreData },
+    { text: "GEL/USD",  onClick:handleCurrencyChange},
     { text: "Clear", onClick: handleClear },
   ];
 
@@ -373,6 +422,7 @@ function App() {
                   (total, treatment) => total + treatment.total,
                   0
                 )}
+                onDelete={() => handleOnPhaseDelete(phase.id)}
               />
               <TreatmentInput
                 onAddTreatment={(treatment) =>
@@ -386,6 +436,7 @@ function App() {
                   key={treatmentIndex}
                   disease={treatment.disease}
                   text={treatment.text}
+                  comment={treatment.comment}
                   quantity={treatment.quantity}
                   onePrice={treatment.onePrice}
                   total={treatment.total}
@@ -399,7 +450,7 @@ function App() {
 
             </div>
           ))}
-          {hasTreatment && <FirstTreatment text={`Total Days: ${formatDate(firstPhaseStartDate)} - ${formatDate(lastPhaseEndDate)} `} price={totalPrice} />}
+          {hasTreatment && <FirstTreatment text={`Total Days: ${formatDate(firstPhaseStartDate)} - ${formatDate(lastPhaseEndDate)} `} isFinal={true} price={totalPrice} />}
         </div>
       </div>
       <ButtonCollection buttons={buttons} />

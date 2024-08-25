@@ -11,7 +11,7 @@ import (
 
 func (a *App) GetPacientsData(email string) (PacientsData, error) {
 	encodedEmail := url.QueryEscape(email)
-	url := fmt.Sprintf(os.Getenv("BASE_URL")+"/fetch-send-data/%s", encodedEmail)
+	url := fmt.Sprintf(os.Getenv("LOCAL_URL")+"/fetch-send-data/%s", encodedEmail)
 
 	resp, err := http.Get(url)
 

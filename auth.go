@@ -20,7 +20,7 @@ type LoginResponse struct {
 }
 
 func (a *App) Login(creds Credentials) bool {
-	loginURL := os.Getenv("BASE_URL") + "/app-login"
+	loginURL := os.Getenv("LOCAL_URL") + "/app-login"
 	jsonData, err := json.Marshal(creds)
 
 	if err != nil {

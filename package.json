@@ -3,6 +3,7 @@
     "axios": "^1.7.2",
     "date-fns": "^3.6.0",
     "html2canvas": "^1.4.1",
-    "react-datepicker": "^7.3.0"
+    "react-datepicker": "^7.3.0",
+    "react-switch": "^7.0.0"
   }
 }

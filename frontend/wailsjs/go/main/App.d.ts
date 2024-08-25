@@ -10,6 +10,8 @@ export function CheckVerisonOnStartup():Promise<void>;
 
 export function DownloadNewVersion(arg1:string):Promise<void>;
 
+export function GetCurrency():Promise<main.CurrencyResponse>;
+
 export function GetPacientsData(arg1:string):Promise<main.PacientsData>;
 
 export function GetUpdateStatus():Promise<boolean|string>;

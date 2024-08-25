@@ -6,7 +6,7 @@ const Treatments = ({
   disease,
   quantity,
   onePrice,
-  clickedTeeth,
+  comment,
   secondTreatment,
   onDelete,
 }) => {
@@ -19,6 +19,9 @@ const Treatments = ({
         </div>
         <div>
           <p>{text}</p>
+        </div>
+        <div>
+          <p>{comment}</p>
         </div>
         {!secondTreatment && (
           <div>

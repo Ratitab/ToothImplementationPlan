@@ -15,7 +15,7 @@ type SearchItem struct {
 
 func (a *App) fetchFromGinSearch(endpoint, query string) ([]SearchItem, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	url := fmt.Sprintf(os.Getenv("BASE_URL_SEARCH")+"%s?query=%s", endpoint, query)
+	url := fmt.Sprintf(os.Getenv("LOCAL_URL_SEARCH")+"%s?query=%s", endpoint, query)
 
 	resp, err := client.Get(url)
 

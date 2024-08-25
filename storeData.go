@@ -17,7 +17,7 @@ type PacientsData struct {
 
 func (a *App) StorePacientsData(data PacientsData) (string, error) {
 	fmt.Println("[DATA FROM STORE DATA]", data.Phases[0].Treatments[0].Comment)
-	url := os.Getenv("BASE_URL") + "/store-data"
+	url := os.Getenv("LOCAL_URL") + "/store-data"
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {

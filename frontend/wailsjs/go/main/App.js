@@ -18,6 +18,10 @@ export function DownloadNewVersion(arg1) {
   return window['go']['main']['App']['DownloadNewVersion'](arg1);
 }
 
+export function GetCurrency() {
+  return window['go']['main']['App']['GetCurrency']();
+}
+
 export function GetPacientsData(arg1) {
   return window['go']['main']['App']['GetPacientsData'](arg1);
 }
