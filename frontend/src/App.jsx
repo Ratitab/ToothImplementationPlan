@@ -20,16 +20,18 @@ import IsNotPaid from "./isNotPaid";
 import DatePicker from "react-datepicker";
 import CheckAppVersion from "./checkVersion";
 import "react-datepicker/dist/react-datepicker.css";
-import { da, tr } from "date-fns/locale";
+import Swal from "sweetalert2";
+import { is } from "date-fns/locale";
+
 function App() {
   const [resultText, setResultText] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [filename, setFilename] = useState("screenshot");
   const [clickedTeeth, setClickedTeeth] = useState({});
-  const [exchangeRate, setExchangeRate] = useState(null)
-  const [amount, setAmount] = useState(0)
-  const [convertedAmount, setConvertedAmount] = useState(0)
+  const [exchangeRate, setExchangeRate] = useState(null);
+  const [amount, setAmount] = useState(0);
+  const [convertedAmount, setConvertedAmount] = useState(0);
   const [phases, setPhases] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [newPhaseDays, setNewPhaseDays] = useState("");
@@ -38,6 +40,8 @@ function App() {
   const [isPaid, setIsPaid] = useState(true);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [isGel, setIsGel] = useState(false);
+  const [visibleHeadings, setVisibleHeadings] = useState(false);
   const teethRef = useRef();
 
   useEffect(() => {
@@ -57,35 +61,20 @@ function App() {
     checkPaymentStatus();
   }, []);
 
-  const fetchExchangeRates = async() => {
+  const fetchExchangeRates = async () => {
     try {
-      const response = await GetCurrency()
-      const data = await response.json()
-      console.log("[DATA]",data)
-      setExchangeRate(data.CurrencyResponse)
+      const response = await GetCurrency();
+      const data = await response.json();
+      console.log("[DATA]", data);
+      setExchangeRate(data.CurrencyResponse);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
-  }
-
-  
-
+  };
 
   const handleCurrencyChange = () => {
-    const data = fetchExchangeRates()
-    console.log(data)
-    if (exchangeRate) {
-      if (isGEL) {
-        setConvertedAmount(amount * exchangeRate); // Convert GEL to USD
-      } else {
-        setConvertedAmount(amount / exchangeRate); // Convert USD back to GEL
-      }
-      setIsGEL(!isGEL); // Toggle the currency state
-    } else {
-      console.error('Exchange rate not available');
-    }
-  }
+    setIsGel(!isGel)
+  };
 
   const handleClear = () => {
     setName("");
@@ -127,7 +116,11 @@ function App() {
 
   const greet = async () => {
     if (email === "" || name === "") {
-      alert("Enter the email and name");
+      Swal.fire({
+        icon: "warning",
+        title: "no name and email selected",
+        text: "please provide name and email"
+      })
       return;
     }
     Greet(name).then(updateResultText);
@@ -156,7 +149,7 @@ function App() {
       total,
     };
 
-    console.log(newTreatment)
+    console.log(newTreatment);
     setPhases((prevPhases) =>
       prevPhases.map((phase) =>
         phase.id === phaseId
@@ -196,6 +189,25 @@ function App() {
 
   const handleAddPhase = () => {
     const clickedTeethArray = teethRef.current.getClickedTeeth();
+
+    if (clickedTeethArray.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Teeth Selected",
+        text: "Please select at least one tooth before adding a phase."
+      })
+      return
+    }
+
+    if (!startDate || !endDate) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Dates Selected",
+        text: "Please select start and end dates before adding a phase."
+      })
+      return
+    }
+
     setQuantity(clickedTeethArray.length);
     console.log("[addphase]", clickedTeethArray);
 
@@ -208,14 +220,13 @@ function App() {
       treatments: [],
       clickedTeeth: clickedTeethArray,
     };
-    console.log("newPhase",newPhase);
+    console.log("newPhase", newPhase);
     setPhases((prevPhases) => [...prevPhases, newPhase]);
     setNewPhaseDays("");
     setClickedTeeth({});
     setStartDate(null); // Reset startDate
     setEndDate(null); // Reset endDate
 
-    
     if (teethRef.current) {
       teethRef.current.clearTeeth();
     }
@@ -228,6 +239,32 @@ function App() {
       console.error("App element not found");
       return;
     }
+
+    const inputs = document.querySelectorAll(".InputsList");
+    const patientsDataInputs = document.querySelector(".patientsData");
+    const calendar = document.querySelector(".enterDays");
+    const btnCollection = document.querySelector(".btnCollection");
+    const deleteButton = document.querySelector(".delete-button");
+
+    patientsDataInputs.style.visibility = "hidden";
+    calendar.style.visibility = "hidden";
+    btnCollection.style.visibility = "hidden";
+    if (deleteButton) {
+      deleteButton.style.visibility = "hidden";
+    }
+
+    setVisibleHeadings(true);
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const removedElements = [];
+    inputs.forEach((input) => {
+      const parent = input.parentNode;
+      const nextSibling = input.nextSibling;
+      removedElements.push({ element: input, parent, nextSibling });
+      input.remove();
+    });
+
     try {
       const canvas = await html2canvas(element, {
         windowWidth: document.documentElement.scrollWidth,
@@ -237,15 +274,37 @@ function App() {
       });
       const dataUrl = canvas.toDataURL();
       const result = await SaveScreenshot(dataUrl, filename);
-      console.log(result);
+      if (result === "No file selected") {
+        setVisibleHeadings(false)
+
+      }
+      // console.log("[SCREENSHOT RESULT]",result);
     } catch (error) {
       console.error("Failed to take screenshot", error);
+    } finally {
+      removedElements.forEach(({ element, parent, nextSibling }) => {
+        if (nextSibling) {
+          parent.insertBefore(element, nextSibling);
+        } else {
+          parent.appendChild(element);
+        }
+      });
+
+      patientsDataInputs.style.visibility = "visible";
+      calendar.style.visibility = "visible";
+      btnCollection.style.visibility = "visible";
+      deleteButton.style.visibility = "visible";
+      setVisibleHeadings(false);
     }
   };
 
   const handleSendMail = async () => {
     if (name === "" || email === "") {
-      alert("enter name and email to proceed");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please Provide With Name and Email",
+      });
       return;
     }
     const processedPhases = phases.map((phase) => ({
@@ -277,9 +336,24 @@ function App() {
     // console.log("[DATA]", data);
     try {
       const result = await SendMail(data);
-      console.log(result);
+      console.log("[SENDMAILRESULT]",result);
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Your Mail Has Sent Successfully",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (error) {
       console.error("Failed to send mail", error);
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: "Failed to send mail",
+        text: error.message || "An error occurred",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
   };
 
@@ -301,9 +375,26 @@ function App() {
       phases: processedPhases,
     };
     console.log("[data for storeData]", data);
+
+    if (name === "" || email === "") {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please Provide With Name and Email",
+      });
+      return;
+    }
+
     try {
       const result = await StorePacientsData(data);
       console.log(result);
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Your work has been saved in Database",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (error) {
       console.error("Error storing pacients data: ", error);
     }
@@ -312,16 +403,16 @@ function App() {
 
   const handleOnPhaseDelete = (id) => {
     setPhases((prevPhases) => {
-      const updatedPhases = prevPhases.filter(phase => phase.id !== id)
+      const updatedPhases = prevPhases.filter((phase) => phase.id !== id);
 
       const reindexedPhases = updatedPhases.map((phase, index) => ({
         ...phase,
-        id:index + 1
-      }))
+        id: index + 1,
+      }));
 
-      return reindexedPhases
-    })
-  }
+      return reindexedPhases;
+    });
+  };
 
   const totalPrice = phases.reduce((total, phase) => {
     return (
@@ -335,20 +426,20 @@ function App() {
 
   const formatDate = (date) => {
     if (!date) return "";
-    const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
-    return new Date(date).toLocaleDateString('en-GB', options);
+    const options = { day: "2-digit", month: "2-digit", year: "2-digit" };
+    return new Date(date).toLocaleDateString("en-GB", options);
   };
 
-  const hasTreatment = phases.some((phase) => phase.treatments.length > 0)
+  const hasTreatment = phases.some((phase) => phase.treatments.length > 0);
   const firstPhaseStartDate = phases.length > 0 ? phases[0].startDate : "";
-  const lastPhaseEndDate = phases.length > 0 ? phases[phases.length - 1].endDate : "";
-
+  const lastPhaseEndDate =
+    phases.length > 0 ? phases[phases.length - 1].endDate : "";
 
   const buttons = [
     { text: "Take Screenshot", onClick: handleScreenshot },
     { text: "Send Mail", onClick: handleSendMail },
     { text: "Store Data", onClick: handleStoreData },
-    { text: "GEL/USD",  onClick:handleCurrencyChange},
+    { text: "GEL/USD", onClick: handleCurrencyChange },
     { text: "Clear", onClick: handleClear },
   ];
 
@@ -356,15 +447,15 @@ function App() {
     setEmail(e.target.value);
   };
 
-  if (!isPaid) {
-    console.log("ARAAGADAXDILI");
-    return alert("ARAGADAXDILI");
-  }
+  // if (!isPaid) {
+  //   console.log("ARAAGADAXDILI");
+  //   return alert("ARAGADAXDILI");
+  // }
 
   return (
     <div id="App">
-      <CheckAppVersion />
-      <div>
+      {/* <CheckAppVersion /> */}
+      <div className="patientsData">
         <div className="pacientsName">Enter Patient's Name and Surname</div>
         <div id="input" className="input-box">
           <input
@@ -417,12 +508,17 @@ function App() {
           {phases.map((phase, index) => (
             <div key={phase.id}>
               <FirstTreatment
-                text={`Phase ${index + 1}: Treatment Days: (${phase.days} days) Dates: (${formatDate(phase.startDate)} - ${formatDate(phase.endDate)})`}
+                text={`Phase ${index + 1}: Treatment Days: (${
+                  phase.days
+                } days) Dates: (${formatDate(phase.startDate)} - ${formatDate(
+                  phase.endDate
+                )})`}
                 price={phase.treatments.reduce(
                   (total, treatment) => total + treatment.total,
                   0
                 )}
                 onDelete={() => handleOnPhaseDelete(phase.id)}
+                isGel={isGel}
               />
               <TreatmentInput
                 onAddTreatment={(treatment) =>
@@ -430,7 +526,21 @@ function App() {
                 }
                 quantity={quantity}
                 clickedTeeth={phase.clickedTeeth}
+                isGel={isGel}
               />
+              {visibleHeadings && (
+                <Treatments
+                  key={"treatmentIndex"}
+                  disease={"DESEASE:"}
+                  text={"TREATMENT:"}
+                  comment={"COMMENT:"}
+                  quantity={0}
+                  onePrice={"PRICE OF ONE TEETH:"}
+                  total={1}
+                  clickedTeeth={0} 
+                  visibleDeleteButton={false}
+                />
+              )}
               {phase.treatments.map((treatment, treatmentIndex) => (
                 <Treatments
                   key={treatmentIndex}
@@ -440,17 +550,26 @@ function App() {
                   quantity={treatment.quantity}
                   onePrice={treatment.onePrice}
                   total={treatment.total}
-                  clickedTeeth={treatment.clickedTeeth} // Display clicked teeth
+                  clickedTeeth={treatment.clickedTeeth}
                   onDelete={() =>
                     handleDeleteTreatment(phase.id, treatmentIndex)
                   }
+                  visibleDeleteButton={true}
+                  isGel={isGel}
                 />
               ))}
-              
-
             </div>
           ))}
-          {hasTreatment && <FirstTreatment text={`Total Days: ${formatDate(firstPhaseStartDate)} - ${formatDate(lastPhaseEndDate)} `} isFinal={true} price={totalPrice} />}
+          {hasTreatment && (
+            <FirstTreatment
+              text={`Total Days: ${formatDate(
+                firstPhaseStartDate
+              )} - ${formatDate(lastPhaseEndDate)} `}
+              isFinal={true}
+              price={totalPrice}
+              isGel={isGel}
+            />
+          )}
         </div>
       </div>
       <ButtonCollection buttons={buttons} />

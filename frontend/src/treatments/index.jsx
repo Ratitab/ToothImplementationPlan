@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./index.css";
 
 const Treatments = ({
@@ -9,7 +9,12 @@ const Treatments = ({
   comment,
   secondTreatment,
   onDelete,
+  visibleDeleteButton,
+  isGel,
 }) => {
+
+  const currencySymbol = isGel ? "₾" : "$"
+
   // console.log("[clicked teeth arr]", clickedTeeth);
   return (
     <div className="TreatmentsList">
@@ -25,15 +30,23 @@ const Treatments = ({
         </div>
         {!secondTreatment && (
           <div>
-            <p>${onePrice}</p>
+            <p>
+              <span className="currency-symbol"></span>
+              {onePrice}
+            </p>
           </div>
         )}
         <div>
-          <p>${quantity * onePrice}</p>
+          <p>
+            <span className="currency-symbol">{currencySymbol}</span>
+            {quantity * onePrice}
+          </p>
         </div>
-        <button className="delete-button" onClick={onDelete}>
-          Delete
-        </button>
+        {visibleDeleteButton && (
+          <button className="delete-button" onClick={onDelete}>
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );

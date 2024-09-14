@@ -3,7 +3,7 @@ import "./index.css";
 import { SearchDiseases, SearchTreatments } from "../../wailsjs/go/main/App";
 import CommentInput from "../commentInput";
 
-const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
+const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth, isGel }) => {
   const [disease, setDisease] = useState("");
   const [text, setText] = useState("");
   const [onePrice, setOnePrice] = useState("");
@@ -36,6 +36,7 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
     if (query.length > 2) {
       try {
         const response = await SearchDiseases(query);
+        console.log(response)
         if (response !== null) {
           setdiseaseSuggestions(response);
         }
@@ -94,10 +95,21 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
     setTreatmentSuggestions([]);
   };
 
+
+  const currencySymbol = isGel ? "₾" : "$"
+
+  // const handleCurrencySignChange = () => {
+  //   if (isGel) {
+  //     el.textContent = "₾";
+  //   } else {
+  //     el.textContent = "$";
+  //   }
+  // }
+
   return (
-    <div className="TreatmentsList">
+    <div className="InputsList">
       <div className="TreatmentsInner">
-        <div>
+        <div className="TeethQuantity">
           Teeth: {clickedTeeth.join(", ")} <p>Quantity: {quantity}x</p>
         </div>
         <div style={{ position: "relative" }}>
@@ -114,6 +126,7 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
                 <li
                   key={index}
                   onClick={() => handleDiseaseSuggestionClick(suggestion)}
+                  className="suggestion-item"
                 >
                   {suggestion.Name}
                 </li>
@@ -135,6 +148,7 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
                 <li
                   key={index}
                   onClick={() => handleTreatmentSuggestionList(suggestion)}
+                className="suggestion-item"
                 >
                   {suggestion.Name}
                 </li>
@@ -161,7 +175,7 @@ const TreatmentInput = ({ onAddTreatment, quantity, clickedTeeth }) => {
         />
         </div>
         <div>
-          <p className="total">${onePrice * quantity}</p>
+          <p className="total"><span className="currency-symbol">{currencySymbol}</span>{onePrice * quantity}</p>
         </div>
         {!text && error}
         <div>

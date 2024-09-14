@@ -63,5 +63,5 @@ func (a *App) startup(ctx context.Context) {
 
 // Greet returns a greeting for the given name
 func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Implantation Plan for %s", name)
+	return fmt.Sprintf("Treatment Plan for %s", name)
 }

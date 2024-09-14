@@ -1,8 +1,9 @@
 package main
 
 import (
-	"bytes"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"net/smtp"
 	"strings"
 )
@@ -24,26 +25,19 @@ type Phase struct {
 }
 
 type EmailData struct {
-	DataUrl string `json:"dataUrl"`
-	Email   string `json:"email"`
-	Name    string `json:"name"`
-	// ClickedTeeth map[int]string `json:"clickedTeeth"`
-	Phases []Phase `json:"phases"`
+	DataUrl string  `json:"dataUrl"`
+	Email   string  `json:"email"`
+	Name    string  `json:"name"`
+	Phases  []Phase `json:"phases"`
 }
-
-// func formatTeethClick(clickedTeeth map[int]string) string {
-// 	var sb strings.Builder
-// 	for tooth, state := range clickedTeeth {
-// 		sb.WriteString(fmt.Sprintf("Tooth %d: %s\n", tooth, state))
-// 	}
-// 	return sb.String()
-// }
 
 func formatTreatments(treatments []Treatment) (string, float64) {
 	var totalPrice float64
 	var sb strings.Builder
 	for _, t := range treatments {
-		sb.WriteString(fmt.Sprintf("	disease:%s,\n	Treatment: %s,\n	Quantity: %d,\n	One Price: %.2f,\n	Comment:%s \n	Total: %.2f\n ", t.Disease, t.Text, t.Quantity, t.OnePrice, t.Comment, t.Total))
+		sb.WriteString(fmt.Sprintf(
+			"<p>&emsp; &ensp; Disease: %s,<br>&emsp; &ensp; Treatment: %s,<br>&emsp; &ensp; Quantity: %d,<br>&emsp; &ensp; One Price: %.2f,<br>&emsp; &ensp; Comment: %s<br>&emsp; &ensp; Total: %.2f</p>",
+			t.Disease, t.Text, t.Quantity, t.OnePrice, t.Comment, t.Total))
 		totalPrice += t.Total
 	}
 	return sb.String(), totalPrice
@@ -54,14 +48,31 @@ func formatPhases(phases []Phase) (string, float64) {
 	var sb strings.Builder
 	for _, phase := range phases {
 		phaseTreatments, phasePrice := formatTreatments(phase.Treatments)
-		sb.WriteString(fmt.Sprintf("Phase ID: %d,\n Days: %s\n	Teeth:%d 	\n%s\n", phase.ID, phase.Days, phase.ClickedTeeth, phaseTreatments))
+		sb.WriteString(fmt.Sprintf(
+			"<p>Phase ID: %d,<br> &nbsp; Days: %s<br>&nbsp;  Teeth: %v%s</p>",
+			phase.ID, phase.Days, phase.ClickedTeeth, phaseTreatments))
 		totalPrice += phasePrice
 	}
 	return sb.String(), totalPrice
 }
 
+func encodeImageToBase64(path string) (string, error) {
+	imageBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(imageBytes), nil
+}
+
 func (a *App) SendMail(data EmailData) string {
+	// Load the logo as Base64
+	logoPath := "./frontend/src/assets/images/richtersLogo.jpg"
+	logoBase64, err := encodeImageToBase64(logoPath)
+	if err != nil {
+		return fmt.Sprintf("Error loading logo: %s", err.Error())
+	}
 	fmt.Println("[DATA]", data)
+	// Email parameters
 	from := "ratiitabidzee@gmail.com"
 	password := "jawb jhpf floe omht"
 	to := data.Email
@@ -70,39 +81,63 @@ func (a *App) SendMail(data EmailData) string {
 
 	phasesFormatted, totalPrice := formatPhases(data.Phases)
 
+	// MIME boundary
+	boundary := "my-boundary-12345"
+
+	// Body of the email with inline image
 	subject := "Patient Treatment Plan"
-	body := fmt.Sprintf(
-		"Patient Name: %s\n\nhases:\n%s\n\nTotal Price: $%.2f",
-		data.Name,
-		phasesFormatted,
-		totalPrice,
-	)
+	body := fmt.Sprintf(`
+--%s
+Content-Type: text/html; charset="UTF-8"
 
-	dataUrlParts := strings.Split(data.DataUrl, ",")
-	if len(dataUrlParts) != 2 {
-		fmt.Errorf("invalid data URL format")
-	}
-	dataMimeType := strings.Split(dataUrlParts[0], ";")[0][5:]
-	dataContent := dataUrlParts[1]
+<html>
+<body>
+    <p>Patient Name: %s</p>
+    <p>Phases:</p>
+    <p>%s</p>
+    <p>Total Price: $%.2f</p>
+    <br><br>
+    <p>Best Regards / საუკეთესო სურვილებით,</p>
+    <div style="display: flex; align-items: center;">
+        <div style="margin-right: 10px;">
+            <img src="cid:richtersLogo" alt="Richter’s Clinic Logo" style="width: 100px;">
+        </div>
+        <div style="border-left: 2px solid black; height: 120px; margin-right: 10px;"></div>
+        <div style="text-align: right;">
+            <p>Richter’s Clinic LLC<br>
+            Mob.: +995 511 111 142 | info@richters.ge<br>
+            Tel.: +995 322 5000 68<br>
+            68a Beliashvili st., Tbilisi, Georgia<br>
+            Website: www.richters.ge</p>
+        </div>
+    </div>
+</body>
+</html>
 
-	buf := bytes.NewBuffer(nil)
-	buf.WriteString(fmt.Sprintf("From: %s\r\n", from))
-	buf.WriteString(fmt.Sprintf("To: %s\r\n", to))
-	buf.WriteString(fmt.Sprintf("Subject: %s\r\n", subject))
-	buf.WriteString("MIME-version: 1.0;\nContent-Type: multipart/related; boundary=\"boundary-example\";\n\n")
-	buf.WriteString("--boundary-example\n")
-	buf.WriteString("Content-Type: text/plain; charset=US-ASCII\n\n")
-	buf.WriteString(body + "\n\n")
-	buf.WriteString(fmt.Sprintf("--boundary-example\nContent-Type: %s; name=\"treatment.jpeg\"\nContent-Disposition: inline; filename=\"treatment.jpeg\"\nContent-Transfer-Encoding: base64\nContent-ID: <treatment.jpeg>\n\n", dataMimeType))
-	buf.WriteString(dataContent + "\n\n")
-	buf.WriteString("--boundary-example--\r\n")
+--%s
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename="logo.jpg"
+Content-ID: <richtersLogo>
 
-	message := buf.Bytes()
+%s
+--%s--`, boundary, data.Name, phasesFormatted, totalPrice, boundary, logoBase64, boundary)
+
+	// Construct the email message
+	message := []byte(
+		"From: " + from + "\n" +
+			"To: " + to + "\n" +
+			"Subject: " + subject + "\n" +
+			"MIME-version: 1.0;\n" +
+			"Content-Type: multipart/related; boundary=\"" + boundary + "\"\n\n" +
+			body)
+
+	// Send the email
 	auth := smtp.PlainAuth("", from, password, smtpHost)
-
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
 	if err != nil {
 		return "Failed to send email: " + err.Error()
 	}
+
 	return "Email Sent Successfully"
 }

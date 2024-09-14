@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./index.css"
 import { GetUpdateStatus, DownloadNewVersion } from "../../wailsjs/go/main/App"
+import Swal from "sweetalert2";
 
 const CheckAppVersion = () => {
     const [updateAvailable, setUpdateAvailable] = useState(false)
@@ -20,10 +21,18 @@ const CheckAppVersion = () => {
     const handleUpdate = async () => {
         try {
             await DownloadNewVersion();
-            alert("new version downloaded. please restart the app to apply updates")
+            Swal.fire({
+              icon: "warning",
+              title:"new version has been downloaded",
+              text:"please restart the app to apply updates"
+            })
         } catch (error) {
             console.error("error downloading new version", error)
-            alert("failed to download the new version")
+            Swal.fire({
+              icon: "warning",
+              title:"failed to download the new version",
+              text:"plase try again"
+            })
         }
     }
 

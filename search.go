@@ -43,7 +43,7 @@ func (a *App) SearchTreatments(query string) ([]SearchItem, error) {
 		return nil, nil
 	}
 
-	results, err := a.fetchFromGinSearch("/api/search-treatments", query)
+	results, err := a.fetchFromGinSearch("api/search-treatments", query)
 
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (a *App) SearchDiseases(query string) ([]SearchItem, error) {
 		return nil, nil
 	}
 
-	results, err := a.fetchFromGinSearch("/api/search-diseases", query)
+	results, err := a.fetchFromGinSearch("api/search-diseases", query)
 	if err != nil {
 		return nil, err
 	}

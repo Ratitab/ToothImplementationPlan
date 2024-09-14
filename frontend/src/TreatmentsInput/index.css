@@ -1,7 +1,12 @@
-.TreatmentsList {
+.InputsList {
   width: 100%;
   padding: 10px;
 }
+
+.TeethQuantity {
+  color: #919191;
+}
+
 
 .TreatmentsInner {
   display: flex;
@@ -69,6 +74,10 @@
 
 .suggestion-list li:hover {
   background-color: #f0f0f0;
+}
+
+.suggestion-item {
+  color: black;
 }
 
 
